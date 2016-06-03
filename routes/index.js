@@ -4,9 +4,14 @@ var request = require('request');
 var EventEmitter = require('events').EventEmitter;
 var myEvents = new EventEmitter();
 var schedule = require('node-schedule');
+var schedule1 = require('node-schedule');
+
 var crawlerTask = require("../crawler/crawlerTask.js");
 var rule = new schedule.RecurrenceRule();
+var rule1 = new schedule1.RecurrenceRule();
+
 var times = [];
+var times1 = [];
 var router = express.Router();
 
 /* GET home page. */
@@ -33,16 +38,16 @@ myEvents.on('start', function () {
         if (crawlerTask.getMainData()) {
             this.cancel();
             console.log('-----------------爬完了-------------------');
-            myEvents.emit('updateOther');
+
         }
     });
 });
 myEvents.on('updateOther',function () {
-    rule.second = times;
+    rule1.second = times1;
     for (var i = 0; i < 60; i = i + 10) {
-        times.push(i);
+        times1.push(i);
     }
-    schedule.scheduleJob(rule, function () {
+    schedule1.scheduleJob(rule1, function () {
         if (crawlerTask.updateTagsAndfans()) {
             this.cancel();
             console.log('-----------------更新完了-------------------');
@@ -51,11 +56,11 @@ myEvents.on('updateOther',function () {
     });
 });
 
-// router.get('/bbbb', function (req, res, next) {
-//     crawlerTask.updateTagsAndfans();
-//     return res.render('index', {title: '更新tag'});
-//
-// });
+router.get('/bbbb', function (req, res, next) {
+    myEvents.emit('updateOther');
+    return res.render('index', {title: '更新tag'});
+
+});
 var mypretime = 0;
 function sub() {
     var Today = new Date();
